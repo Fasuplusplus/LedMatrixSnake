@@ -42,7 +42,7 @@ class dot { //puntos
 };
 dot head; //punto "cabeza"
 byte tailLong = 3; //longitud actual de la cola
-const byte longLim = 10; //límite de longitud de la cola (cabeza == 0)
+const byte longLim = 20; //límite de longitud de la cola (cabeza == 0)
 dot tail[longLim - 1]; //cola
 dot apple;
 long randX; //variables para números aleatorios
@@ -204,6 +204,7 @@ void checkJoystick() {
   head.dotSpeedY = speeds[joyForceY];
 }
 void setup() {
+  randomSeed(analogRead(5));
   declararCaprichosas();
   pinMode(inp, OUTPUT);
   pinMode(rcl, OUTPUT);

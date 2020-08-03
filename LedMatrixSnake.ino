@@ -1,7 +1,7 @@
 //El dibujado se hace de izquierda a derecha, en las columnas.
 //Y columnas, X es filas
 //SIEMPRE TENER UN LIMITADOR DE FPS YA SEA EN drawScreen O EN EL LOOP PRINCIPAL
-//1,2,3,4,5,6, 10, 12, 15, 20, 30 y 60 (múltiplos de 60)
+//1,2,3,4,5,6, 10, 12, 15, 20, 30 y 60 (divisores de 60)
 byte inp = 2;//Serial Input
 byte rcl = 3;//Register Clock/Refresh Outputs
 byte scl = 4;//Serial Clock/Shift register
@@ -41,8 +41,14 @@ class dot { //puntos
     }
 };
 dot head; //punto "cabeza"
-byte tailLong = 4; //longitud actual de la cola
-dot tail[10]; //cola (límite decidido de antemano)
+byte tailLong = 3; //longitud actual de la cola
+const byte longLim = 10; //límite de longitud de la cola (cabeza == 0)
+dot tail[longLim - 1]; //cola
+dot apple;
+long randX; //variables para números aleatorios
+long randY;
+byte usedX[longLim];
+byte usedY[longLim];
 int dotDirX = 1; // 1||-1
 int dotDirY = -1; // ""
 byte frame = 0; //contador de frames
@@ -109,16 +115,54 @@ void borderWarp() {
     head.dotY = 7;
   }
 }
+void placeApple() {
+generate:
+  randX = random (0, 7);
+  randY = random (0, 7);
+  bool ocup = 0;
+  for (byte i = 0; i <= tailLong; i++) {
+    if (randX == usedX[i] && randY == usedY[i]) {
+      ocup = 1;
+      break;
+    }
+    if (ocup == 1) {
+      goto generate;
+    }
+    else {
+      apple.dotX = randX;
+      apple.dotY = randY;
+    }
+  }
+}
+void eatApple() {
+  if (head.dotX == apple.dotX && head.dotY == apple.dotY) {
+    placeApple();
+    tailLong++;
+  }
+}
+void blinkApple() {
+  if (frame % 10 == 0) {
+    apple.frameDot();
+  }
+}
 void taylTracing() { //jaja es gracioso porque se parece a RayTracing pero es para mover la cola
   for (int i = (tailLong - 1); i >= 0; i--) { //tailLong == 4
     if (i == 0) {
       tail[i].dotX = head.dotX;
-     tail[i].dotY = head.dotY;
-     }
-     else {
-    tail[i].dotX = tail[i - 1].dotX;
-    tail[i].dotY = tail[i - 1].dotY;
-      }
+      tail[i].dotY = head.dotY;
+    }
+    else {
+      tail[i].dotX = tail[i - 1].dotX;
+      tail[i].dotY = tail[i - 1].dotY;
+    }
+  }
+}
+void track() { //registrar posiciones ocupadas
+  usedX[0] = head.dotX;
+  usedY[0] = head.dotY;
+  for (byte i = 1; i <= tailLong; i++) {
+    usedX[i] = tail[i - 1].dotX;
+    usedY[i] = tail[i - 1].dotY;
   }
 }
 void frameTail() {
@@ -175,10 +219,14 @@ void setup() {
   pinMode(x8, OUTPUT);
   Xoff();
   digitalWrite(rcl, LOW);
+  track();
+  placeApple();
 }
 
 void loop() {
+  eatApple();
   head.frameDot();
+  blinkApple();
   frameTail();
   drawScreen();
   frame++;
@@ -187,10 +235,12 @@ void loop() {
   if ((frame % head.dotSpeedX) == 0) {
     taylTracing();
     head.dotX = (head.dotX + dotDirX);
+    track();
   }
   if ((frame % head.dotSpeedY) == 0) {
     taylTracing();
     head.dotY = (head.dotY + dotDirY);
+    track();
   }
   if (frame == 60) {
     frame = 0;

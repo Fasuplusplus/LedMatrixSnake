@@ -138,6 +138,7 @@ void eatApple() {
   if (head.dotX == apple.dotX && head.dotY == apple.dotY) {
     placeApple();
     tailLong++;
+    taylTracing();
   }
 }
 void blinkApple() {

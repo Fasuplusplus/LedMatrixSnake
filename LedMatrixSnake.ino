@@ -136,9 +136,10 @@ generate:
 }
 void eatApple() {
   if (head.dotX == apple.dotX && head.dotY == apple.dotY) {
-    placeApple();
     tailLong++;
     taylTracing();
+    track();
+    placeApple();
   }
 }
 void blinkApple() {

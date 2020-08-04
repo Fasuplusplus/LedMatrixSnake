@@ -172,7 +172,9 @@ void track() { //registrar posiciones ocupadas
 }
 void frameTail() {
   for (byte i = 0; i < tailLong; i++) {
-    tail[i].frameDot();
+    if (frame % 3 == 0) {
+      tail[i].frameDot();
+    }
   }
 }
 void clearFrame() {

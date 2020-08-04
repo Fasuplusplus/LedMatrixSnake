@@ -137,7 +137,8 @@ generate:
 void eatApple() {
   if (head.dotX == apple.dotX && head.dotY == apple.dotY) {
     tailLong++;
-    taylTracing();
+    tail[tailLong - 1].dotX = tail[tailLong - 2].dotX;
+    tail[tailLong - 1].dotY = tail[tailLong - 2].dotY;
     track();
     placeApple();
   }
@@ -148,7 +149,9 @@ void blinkApple() {
   }
 }
 void taylTracing() { //jaja es gracioso porque se parece a RayTracing pero es para mover la cola
-  for (int i = (tailLong - 1); i >= 0; i--) { //tailLong == 4
+  for (int i = (tailLong - 1); i >= 0; i--) {
+    Serial.print("i=");
+    Serial.println(i);
     if (i == 0) {
       tail[i].dotX = head.dotX;
       tail[i].dotY = head.dotY;
@@ -205,6 +208,7 @@ void checkJoystick() {
   head.dotSpeedY = speeds[joyForceY];
 }
 void setup() {
+  Serial.begin(9600);
   randomSeed(analogRead(5));
   declararCaprichosas();
   pinMode(inp, OUTPUT);

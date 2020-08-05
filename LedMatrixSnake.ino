@@ -42,7 +42,7 @@ class dot { //puntos
 };
 dot head; //punto "cabeza"
 byte tailLong = 3; //longitud actual de la cola
-const byte longLim = 20; //límite de longitud de la cola (cabeza == 0)
+const byte longLim = 63; //límite de longitud de la cola (cabeza == 0)
 dot tail[longLim - 1]; //cola
 dot apple;
 long randX; //variables para números aleatorios
@@ -117,15 +117,14 @@ void borderWarp() {
 }
 void placeApple() {
 generate:
-  randX = random (0, 7);
-  randY = random (0, 7);
-  bool ocup = 0;
+  randX = random (0, 8);
+  randY = random (0, 8);
+  bool ocup = false;
   for (byte i = 0; i <= tailLong; i++) {
     if (randX == usedX[i] && randY == usedY[i]) {
-      ocup = 1;
-      break;
+      ocup = true;
     }
-    if (ocup == 1) {
+    if (ocup == true) {
       goto generate;
     }
     else {
@@ -210,7 +209,6 @@ void checkJoystick() {
   head.dotSpeedY = speeds[joyForceY];
 }
 void setup() {
-  Serial.begin(9600);
   randomSeed(analogRead(5));
   declararCaprichosas();
   pinMode(inp, OUTPUT);

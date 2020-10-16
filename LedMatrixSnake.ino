@@ -1,7 +1,8 @@
 //El dibujado se hace de izquierda a derecha, en las columnas.
-//Y columnas, X es filas
+//Y es eje vertical, X es eje horizontal.
 //SIEMPRE TENER UN LIMITADOR DE FPS YA SEA EN drawScreen O EN EL LOOP PRINCIPAL
 //1,2,3,4,5,6, 10, 12, 15, 20, 30 y 60 (divisores de 60)
+bool mode = 0; //0: Modo snake (solo control de dirección)|1:Modo manual (control de dirección y velocidad)
 byte inp = 2;//Serial Input
 byte rcl = 3;//Register Clock/Refresh Outputs
 byte scl = 4;//Serial Clock/Shift register
@@ -41,7 +42,7 @@ class dot { //puntos
     }
 };
 dot head; //punto "cabeza"
-byte tailLong = 3; //longitud actual de la cola
+byte tailLong; //longitud actual de la cola
 const byte longLim = 63; //límite de longitud de la cola (cabeza == 0)
 dot tail[longLim - 1]; //cola
 dot apple;
@@ -52,12 +53,13 @@ byte usedY[longLim];
 int dotDirX = 1; // 1||-1
 int dotDirY = -1; // ""
 byte frame = 0; //contador de frames
-void declararCaprichosas() { //no se pueden declarar valores para variables de clase fuera de un loop así que las meto acá así no joden
-  head.dotX = 0;
+void startingVal() { //poner la viborita en el lugar
+  tailLong = 2;
+  head.dotX = 4;
   head.dotY = 4;
-  for (byte i = 0; i < tailLong; i++) {
-    tail[i].dotY = 4;
-    tail[i].dotX = (i + 1);
+  for (byte i = head.dotX; i < (head.dotX + tailLong); i++) {
+    tail[i - head.dotX].dotY = 4;
+    tail[i - head.dotX].dotX = (i + 1);
   }
 }
 void write1() {
@@ -193,7 +195,7 @@ void checkJoystick() {
   joyForceY = map(iY, 0, 1023, -6, 6);
   if (joyForceX < 0) {
     dotDirX = 1;
-    joyForceX = abs(joyForceX);
+    joyForceX = abs(joyForceX); //explicación al final de la función
   }
   else if (joyForceX > 0) {
     dotDirX = -1;
@@ -210,7 +212,7 @@ void checkJoystick() {
 }
 void setup() {
   randomSeed(analogRead(5));
-  declararCaprichosas();
+  startingVal();
   pinMode(inp, OUTPUT);
   pinMode(rcl, OUTPUT);
   pinMode(scl, OUTPUT);
